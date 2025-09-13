@@ -161,6 +161,22 @@ components:
       required:
         - code
         - message
+    IndexSalaryResponse:
+      type: object
+      description: Response after indexing a worker's salary.
+      properties:
+        message:
+          type: string
+          description: Confirmation message.
+          example: "Salary of worker 12 updated by coefficient 1.15."
+        newSalary:
+          type: integer
+          format: int64
+          description: The new salary after applying the coefficient.
+          example: 57500
+      required:
+        - message
+        - newSalary
   parameters:
     page:
       name: page
@@ -217,6 +233,15 @@ components:
         type: string
         format: date-time
         example: '2023-10-01T10:00:00Z'
+    salary-coeff:
+      name: coeff
+      in: path
+      description: Coefficient for salary indexing (must be > 0).
+      required: true
+      schema:
+        type: number
+        format: double
+        minimum: 0.1
 
 
 
