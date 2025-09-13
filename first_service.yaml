@@ -30,10 +30,12 @@ info:
     email: myilanka8@gmail.com
   version: "1.0"
 servers:
-  - url: https://localhost:8080/api/v1
+  - url: https://localhost:8080/api/v1/workers
 tags:
   - name: Workers
     description: Operations related to Worker entities
+  - name: Workers Execution
+    description: Operations that execute specific actions on Worker entities
 paths:
   /workers:
     get:
@@ -44,17 +46,13 @@ paths:
       parameters:
         - $ref: 'models.yaml#/components/parameters/page'
         - $ref: 'models.yaml#/components/parameters/size'
-        - $ref: 'models.yaml#/components/parameters/sort'
-        - $ref: 'models.yaml#/components/parameters/filter'
       responses:
         '200':
           description: A JSON array of worker objects
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: 'models.yaml#/components/schemas/Worker'
+                $ref: 'models.yaml#/components/schemas/PaginatedWorkersResponse'
         '400':
           description: Bad Request - Invalid parameters
           content:
@@ -87,6 +85,40 @@ paths:
                 $ref: 'models.yaml#/components/schemas/Worker'
         '400':
           description: Bad Request - Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: 'models.yaml#/components/schemas/ErrorResponse'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: 'models.yaml#/components/schemas/ErrorResponse'
+  /workers/search:
+    post:
+      tags:
+        - Workers
+      summary: Searches for workers based on criteria
+      description: Retrieves an array of worker objects that match the specified search criteria.
+      parameters:
+        - $ref: 'models.yaml#/components/parameters/page'
+        - $ref: 'models.yaml#/components/parameters/size'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: 'models.yaml#/components/schemas/SearchCriteria'
+      responses:
+        '200':
+          description: A JSON array of worker objects matching the criteria
+          content:
+            application/json:
+              schema:
+                $ref: 'models.yaml#/components/schemas/PaginatedWorkersResponse'
+        '400':
+          description: Bad Request - Invalid parameters or criteria
           content:
             application/json:
               schema:
@@ -184,10 +216,10 @@ paths:
             application/json:
               schema:
                 $ref: 'models.yaml#/components/schemas/ErrorResponse'
-  /workers/delete-by-start-date:
+  /workers/by-start-date:
     delete:
       tags:
-        - Workers
+        - Workers Execution
       summary: Deletes a worker by start date
       description: Deletes one (any) worker whose startDate field value is equivalent to the specified value.
       parameters:
@@ -213,10 +245,10 @@ paths:
             application/json:
               schema:
                 $ref: 'models.yaml#/components/schemas/ErrorResponse'
-  /workers/min-salary:
+  /workers/by-min-salary:
     get:
       tags:
-        - Workers
+        - Workers Execution
       summary: Retrieves the worker with the minimum salary
       description: Returns one (any) worker whose salary field value is the minimum.
       responses:
@@ -239,9 +271,9 @@ paths:
               schema:
                 $ref: 'models.yaml#/components/schemas/ErrorResponse'
   /workers/count-by-start-date:
-    get:
+    post:
       tags:
-        - Workers
+        - Workers Execution
       summary: Counts workers with start date less than the specified value
       description: Returns the number of workers whose startDate field value is less than the specified value.
       parameters:
